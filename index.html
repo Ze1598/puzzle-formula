@@ -17,6 +17,65 @@
   <div id="puzzle-container">
   </div>
 
+  <!-- Modal for editing puzzle pieces -->
+  <div id="piece-edit-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Edit Puzzle Piece</h2>
+      
+      <div class="modal-section">
+        <label for="piece-label">Piece Label:</label>
+        <input type="text" id="piece-label" placeholder="Enter piece label">
+      </div>
+
+      <div class="modal-section">
+        <h3>Edge Types</h3>
+        <div class="edge-controls">
+          <div class="edge-control">
+            <label for="top-edge">Top Edge:</label>
+            <select id="top-edge">
+              <option value="flat">Straight</option>
+              <option value="tab_out">Tab</option>
+              <option value="tab_in">Indentation</option>
+            </select>
+          </div>
+          <div class="edge-control">
+            <label for="right-edge">Right Edge:</label>
+            <select id="right-edge">
+              <option value="flat">Straight</option>
+              <option value="tab_out">Tab</option>
+              <option value="tab_in">Indentation</option>
+            </select>
+          </div>
+          <div class="edge-control">
+            <label for="bottom-edge">Bottom Edge:</label>
+            <select id="bottom-edge">
+              <option value="flat">Straight</option>
+              <option value="tab_out">Tab</option>
+              <option value="tab_in">Indentation</option>
+            </select>
+          </div>
+          <div class="edge-control">
+            <label for="left-edge">Left Edge:</label>
+            <select id="left-edge">
+              <option value="flat">Straight</option>
+              <option value="tab_out">Tab</option>
+              <option value="tab_in">Indentation</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <button id="delete-piece" class="delete-button">Delete Piece</button>
+      </div>
+
+      <div class="modal-section">
+        <button id="save-changes">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 

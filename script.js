@@ -5,6 +5,126 @@ document.addEventListener('DOMContentLoaded', () => {
 		return;
 	}
 
+	// --- Piece Configuration Store ---
+	const pieceConfigStore = new Map();
+
+	// Helper function to get piece ID
+	function getPieceId(piece) {
+		return piece.id.replace('piece-', '');
+	}
+
+	// Helper function to create piece ID
+	function createPieceId(id) {
+		return `piece-${id}`;
+	}
+
+	// --- Modal Functionality ---
+	const modal = document.getElementById('piece-edit-modal');
+	const closeModal = document.querySelector('.close-modal');
+	const pieceLabelInput = document.getElementById('piece-label');
+	const topEdgeSelect = document.getElementById('top-edge');
+	const rightEdgeSelect = document.getElementById('right-edge');
+	const bottomEdgeSelect = document.getElementById('bottom-edge');
+	const leftEdgeSelect = document.getElementById('left-edge');
+	const deletePieceButton = document.getElementById('delete-piece');
+	const saveChangesButton = document.getElementById('save-changes');
+
+	let currentPiece = null;
+
+	function showModal(piece) {
+		currentPiece = piece;
+		const pieceId = getPieceId(piece);
+		const label = piece.querySelector('.piece-label');
+		
+		console.log('Opening modal for piece:', pieceId);
+		console.log('Current store contents:', Array.from(pieceConfigStore.entries()));
+		
+		// Get current values
+		const currentLabel = label.textContent;
+		
+		// Set modal values
+		pieceLabelInput.value = currentLabel;
+		
+		// Get edge types from the store
+		const pieceConfig = pieceConfigStore.get(pieceId);
+		console.log('Retrieved config for piece:', pieceId, pieceConfig);
+		
+		if (pieceConfig) {
+			// Set select values based on stored edge types
+			topEdgeSelect.value = pieceConfig.top;
+			rightEdgeSelect.value = pieceConfig.right;
+			bottomEdgeSelect.value = pieceConfig.bottom;
+			leftEdgeSelect.value = pieceConfig.left;
+		} else {
+			console.warn('No configuration found for piece:', pieceId);
+			// Fallback to default values if not found in store
+			topEdgeSelect.value = EdgeType.FLAT;
+			rightEdgeSelect.value = EdgeType.FLAT;
+			bottomEdgeSelect.value = EdgeType.FLAT;
+			leftEdgeSelect.value = EdgeType.FLAT;
+		}
+		
+		modal.style.display = 'block';
+	}
+
+	function hideModal() {
+		modal.style.display = 'none';
+		currentPiece = null;
+	}
+
+	// Modal event listeners
+	closeModal.addEventListener('click', hideModal);
+	window.addEventListener('click', (e) => {
+		if (e.target === modal) {
+			hideModal();
+		}
+	});
+
+	deletePieceButton.addEventListener('click', () => {
+		if (currentPiece) {
+			const pieceId = getPieceId(currentPiece);
+			console.log('Deleting piece configuration:', pieceId);
+			pieceConfigStore.delete(pieceId);
+			currentPiece.remove();
+			hideModal();
+		}
+	});
+
+	saveChangesButton.addEventListener('click', () => {
+		if (currentPiece) {
+			const pieceId = getPieceId(currentPiece);
+			const label = currentPiece.querySelector('.piece-label');
+			label.textContent = pieceLabelInput.value;
+			
+			// Create new piece with updated edge types
+			const newConfig = {
+				top: topEdgeSelect.value,
+				right: rightEdgeSelect.value,
+				bottom: bottomEdgeSelect.value,
+				left: leftEdgeSelect.value,
+				labelText: pieceLabelInput.value,
+				initialX: parseInt(currentPiece.style.left),
+				initialY: parseInt(currentPiece.style.top),
+				color: currentPiece.querySelector('.puzzle-piece-path').style.fill
+			};
+			
+			// Update the store
+			console.log('Updating configuration for piece:', pieceId, newConfig);
+			pieceConfigStore.set(pieceId, {
+				top: newConfig.top,
+				right: newConfig.right,
+				bottom: newConfig.bottom,
+				left: newConfig.left
+			});
+			
+			// Replace the old piece with a new one
+			const newPiece = createPuzzlePieceElement(pieceId, newConfig);
+			currentPiece.replaceWith(newPiece);
+			
+			hideModal();
+		}
+	});
+
 	// --- Configuration ---
 	const PIECE_WIDTH = 100;
 	const PIECE_HEIGHT = 100;
@@ -79,9 +199,18 @@ document.addEventListener('DOMContentLoaded', () => {
 	function createPuzzlePieceElement(id, config) {
 		const { top, right, bottom, left, labelText, initialX, initialY, color } = config;
 
+		// Store the edge configuration
+		console.log('Creating piece with configuration:', id, config);
+		pieceConfigStore.set(id, {
+			top,
+			right,
+			bottom,
+			left
+		});
+
 		// Create the wrapper div
 		const wrapper = document.createElement('div');
-		wrapper.id = `piece-${id}`;
+		wrapper.id = createPieceId(id);
 		wrapper.className = 'puzzle-piece-wrapper';
 		wrapper.style.left = `${initialX}px`;
 		wrapper.style.top = `${initialY}px`;
@@ -149,13 +278,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		label.style.left = `${PIECE_WIDTH / 2}px`;  // Center horizontally in the base W area
 		label.style.transform = 'translate(-50%, -50%)'; // Fine-tune centering
 
-		// Handle double-click on the wrapper to make label editable
+		// Handle double-click on the wrapper to show edit modal
 		wrapper.addEventListener('dblclick', (e) => {
 			e.stopPropagation(); // Prevent any other double-click handlers
-			label.contentEditable = true;
-			label.focus();
+			showModal(wrapper);
 		});
 
+		// Remove the old label editing handlers since we're using the modal now
 		// Handle label editing completion
 		label.addEventListener('blur', () => {
 			label.contentEditable = false;
@@ -290,11 +419,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	];
 
 	initialPieces.forEach((config, index) => {
-		const piece = createPuzzlePieceElement(index + 1, {
+		const pieceId = (index + 1).toString();
+		const piece = createPuzzlePieceElement(pieceId, {
 			...config,
-			labelText: `Piece ${index + 1}`
+			labelText: `Piece ${pieceId}`
 		});
 		puzzleContainer.appendChild(piece);
+		console.log('Created initial piece:', pieceId, config);
 	});
 
 	// --- NEW: Add piece button functionality ---
@@ -302,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (addPieceButton) {
 		addPieceButton.addEventListener('click', () => {
 			// Generate a random ID for the new piece
-			const newId = Date.now();
+			const newId = Date.now().toString();
 			// Count the number of existing pieces to determine the label
 			const existingPieces = puzzleContainer.getElementsByClassName('puzzle-piece-wrapper').length;
 			const labelText = `Piece ${existingPieces + 1}`;
@@ -314,12 +445,13 @@ document.addEventListener('DOMContentLoaded', () => {
 				bottom: edgeTypes[Math.floor(Math.random() * edgeTypes.length)],
 				left: edgeTypes[Math.floor(Math.random() * edgeTypes.length)],
 				labelText: labelText,
-				initialX: 50, // Place it at (50,50) initially
+				initialX: 50,
 				initialY: 50,
 				color: 'lightblue'
 			};
 			const newPiece = createPuzzlePieceElement(newId, config);
 			puzzleContainer.appendChild(newPiece);
+			console.log('Added new piece:', newId, config);
 		});
 	} else {
 		console.error("Add piece button not found!");
