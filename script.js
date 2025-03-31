@@ -445,26 +445,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		wrapper.appendChild(label); // Add label to wrapper
 
-		// Add delete button
-		const deleteButton = document.createElement('div');
-		deleteButton.className = 'delete-button';
-		deleteButton.innerHTML = '×';
-		deleteButton.addEventListener('click', (e) => {
-			e.stopPropagation(); // Prevent dragging when clicking delete
-			const pieceId = getPieceId(wrapper);
-			console.log('Deleting piece configuration:', pieceId);
-			
-			// Remove from store and save to localStorage
-			pieceConfigStore.delete(pieceId);
-			saveToLocalStorage();
-			
-			// Remove the piece from the DOM
-			wrapper.remove();
-			
-			console.log('Piece deleted and store updated:', pieceId);
-		});
-		wrapper.appendChild(deleteButton);
-
 		// Add dragging behaviour to the wrapper
 		addDragFunctionality(wrapper);
 

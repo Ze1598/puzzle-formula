@@ -87,34 +87,6 @@ body {
 	outline: 1px solid #666;
 }
 
-.delete-button {
-	position: absolute;
-	top: 5px;
-	right: 5px;
-	width: 20px;
-	height: 20px;
-	background: rgba(255, 0, 0, 0.7);
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: white;
-	font-size: 14px;
-	cursor: pointer;
-	z-index: 1001;
-	opacity: 0;
-	transition: opacity 0.2s;
-	pointer-events: auto;
-}
-
-.puzzle-piece-wrapper:hover .delete-button {
-	opacity: 1;
-}
-
-.delete-button:hover {
-	background: rgba(255, 0, 0, 0.9);
-}
-
 /* Modal Styles */
 .modal {
     display: none;
