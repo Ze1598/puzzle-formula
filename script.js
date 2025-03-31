@@ -245,4 +245,45 @@ document.addEventListener('DOMContentLoaded', () => {
 		puzzleContainer.appendChild(pieceElement);
 	});
 
+	// --- NEW: Add piece button functionality ---
+	const addPieceButton = document.getElementById('add-piece-button');
+	if (addPieceButton) {
+		addPieceButton.addEventListener('click', () => {
+			// Generate a random ID for the new piece
+			const newId = Date.now();
+			// Count the number of existing pieces to determine the label
+			const existingPieces = puzzleContainer.getElementsByClassName('puzzle-piece-wrapper').length;
+			const labelText = `Piece ${existingPieces + 1}`;
+			// Randomly select edge types (FLAT, TAB_OUT, or TAB_IN)
+			const edgeTypes = [EdgeType.FLAT, EdgeType.TAB_OUT, EdgeType.TAB_IN];
+			const config = {
+				top: edgeTypes[Math.floor(Math.random() * edgeTypes.length)],
+				right: edgeTypes[Math.floor(Math.random() * edgeTypes.length)],
+				bottom: edgeTypes[Math.floor(Math.random() * edgeTypes.length)],
+				left: edgeTypes[Math.floor(Math.random() * edgeTypes.length)],
+				labelText: labelText,
+				initialX: 50, // Place it at (50,50) initially
+				initialY: 50,
+				color: 'lightblue'
+			};
+			const newPiece = createPuzzlePieceElement(newId, config);
+			puzzleContainer.appendChild(newPiece);
+		});
+	} else {
+		console.error("Add piece button not found!");
+	}
+
+	// --- (Optional) Initial piece creation ---
+	// You can uncomment and modify this section to create initial pieces on page load
+	// const initialPiece = createPuzzlePieceElement(1, {
+	//     top: EdgeType.FLAT,
+	//     right: EdgeType.TAB_OUT,
+	//     bottom: EdgeType.FLAT,
+	//     left: EdgeType.TAB_IN,
+	//     labelText: "Piece 1",
+	//     initialX: 50,
+	//     initialY: 50,
+	//     color: 'lightblue'
+	// });
+	// puzzleContainer.appendChild(initialPiece);
 });
