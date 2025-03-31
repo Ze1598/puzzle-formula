@@ -32,6 +32,7 @@ body {
 	/* Contain the SVG and label */
 	display: inline-block;
 	/* Adjusts size to content */
+	pointer-events: auto;
 }
 
 .puzzle-piece-wrapper.dragging {
@@ -47,6 +48,7 @@ body {
 	/* Prevent extra space below SVG */
 	overflow: visible;
 	/* Allow tabs/indents to draw outside the base rect */
+	pointer-events: none;
 }
 
 .puzzle-piece-path {
@@ -62,15 +64,20 @@ body {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: bold;
 	color: #333;
 	text-align: center;
-	pointer-events: auto;
-	white-space: nowrap;
+	pointer-events: none;
+	width: 80%;
+	height: 80%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	max-width: 80%;
+	word-wrap: break-word;
+	hyphens: auto;
 }
 
 .piece-label[contenteditable="true"] {
@@ -97,6 +104,7 @@ body {
 	z-index: 1001;
 	opacity: 0;
 	transition: opacity 0.2s;
+	pointer-events: auto;
 }
 
 .puzzle-piece-wrapper:hover .delete-button {
