@@ -256,8 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			right: EdgeType.TAB_OUT,  // Will connect with piece 2's left edge
 			bottom: EdgeType.TAB_OUT,  // Will connect with piece 3's top edge
 			left: EdgeType.FLAT,
-			initialX: 50,
-			initialY: 50,
+			initialX: puzzleContainer.offsetWidth / 2 - PIECE_WIDTH,  // Center horizontally
+			initialY: puzzleContainer.offsetHeight / 2 - PIECE_HEIGHT,  // Center vertically
 			color: 'lightblue'
 		},
 		{
@@ -265,8 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			right: EdgeType.FLAT,
 			bottom: EdgeType.TAB_IN,   // Will connect with piece 4's top edge
 			left: EdgeType.TAB_IN,     // Will connect with piece 1's right edge
-			initialX: 200,
-			initialY: 50,
+			initialX: puzzleContainer.offsetWidth / 2,  // Center horizontally + one piece width
+			initialY: puzzleContainer.offsetHeight / 2 - PIECE_HEIGHT,  // Center vertically
 			color: 'lightgreen'
 		},
 		{
@@ -274,8 +274,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			right: EdgeType.TAB_OUT,   // Will connect with piece 4's left edge
 			bottom: EdgeType.FLAT,
 			left: EdgeType.FLAT,
-			initialX: 50,
-			initialY: 200,
+			initialX: puzzleContainer.offsetWidth / 2 - PIECE_WIDTH,  // Center horizontally
+			initialY: puzzleContainer.offsetHeight / 2,  // Center vertically + one piece height
 			color: 'lightpink'
 		},
 		{
@@ -283,8 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			right: EdgeType.FLAT,
 			bottom: EdgeType.FLAT,
 			left: EdgeType.TAB_IN,     // Will connect with piece 3's right edge
-			initialX: 200,
-			initialY: 200,
+			initialX: puzzleContainer.offsetWidth / 2,  // Center horizontally + one piece width
+			initialY: puzzleContainer.offsetHeight / 2,  // Center vertically + one piece height
 			color: 'lightyellow'
 		}
 	];
