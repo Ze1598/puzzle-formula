@@ -221,28 +221,52 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	// --- Example Piece Definitions (Ensure compatibility) ---
-	const pieces = [
-		// Row 1
-		{ id: 1, top: EdgeType.FLAT, right: EdgeType.TAB_OUT, bottom: EdgeType.TAB_OUT, left: EdgeType.FLAT, labelText: 'R1, C1', initialX: 50, initialY: 50, color: 'coral' },
-		{ id: 2, top: EdgeType.FLAT, right: EdgeType.FLAT, bottom: EdgeType.TAB_IN, left: EdgeType.TAB_IN, labelText: 'R1, C2', initialX: 170, initialY: 50, color: 'lightblue' }, // Matches P1 right/bottom
-
-		// Row 2
-		{ id: 3, top: EdgeType.TAB_IN, right: EdgeType.TAB_OUT, bottom: EdgeType.FLAT, left: EdgeType.FLAT, labelText: 'R2, C1', initialX: 50, initialY: 170, color: 'lightgreen' }, // Matches P1 bottom
-		{ id: 4, top: EdgeType.TAB_OUT, right: EdgeType.FLAT, bottom: EdgeType.FLAT, left: EdgeType.TAB_IN, labelText: 'R2, C2', initialX: 170, initialY: 170, color: 'khaki' } // Matches P3 right, P2 bottom
+	// --- Initial piece creation ---
+	const initialPieces = [
+		{
+			top: EdgeType.FLAT,
+			right: EdgeType.TAB_OUT,  // Will connect with piece 2's left edge
+			bottom: EdgeType.TAB_OUT,  // Will connect with piece 3's top edge
+			left: EdgeType.FLAT,
+			initialX: 50,
+			initialY: 50,
+			color: 'lightblue'
+		},
+		{
+			top: EdgeType.FLAT,
+			right: EdgeType.FLAT,
+			bottom: EdgeType.TAB_IN,   // Will connect with piece 4's top edge
+			left: EdgeType.TAB_IN,     // Will connect with piece 1's right edge
+			initialX: 200,
+			initialY: 50,
+			color: 'lightgreen'
+		},
+		{
+			top: EdgeType.TAB_IN,      // Will connect with piece 1's bottom edge
+			right: EdgeType.TAB_OUT,   // Will connect with piece 4's left edge
+			bottom: EdgeType.FLAT,
+			left: EdgeType.FLAT,
+			initialX: 50,
+			initialY: 200,
+			color: 'lightpink'
+		},
+		{
+			top: EdgeType.TAB_OUT,     // Will connect with piece 2's bottom edge
+			right: EdgeType.FLAT,
+			bottom: EdgeType.FLAT,
+			left: EdgeType.TAB_IN,     // Will connect with piece 3's right edge
+			initialX: 200,
+			initialY: 200,
+			color: 'lightyellow'
+		}
 	];
 
-	// Ensure piece definitions are compatible (tab_out matches tab_in on adjacent edges)
-	// P1 right=out  -> P2 left=in
-	// P1 bottom=out -> P3 top=in
-	// P2 bottom=in  -> P4 top=out (fixed definition)
-	// P3 right=out  -> P4 left=in
-
-
-	// --- Generate and Add Pieces to the DOM ---
-	pieces.forEach(pieceConfig => {
-		const pieceElement = createPuzzlePieceElement(pieceConfig.id, pieceConfig);
-		puzzleContainer.appendChild(pieceElement);
+	initialPieces.forEach((config, index) => {
+		const piece = createPuzzlePieceElement(index + 1, {
+			...config,
+			labelText: `Piece ${index + 1}`
+		});
+		puzzleContainer.appendChild(piece);
 	});
 
 	// --- NEW: Add piece button functionality ---
@@ -272,18 +296,4 @@ document.addEventListener('DOMContentLoaded', () => {
 	} else {
 		console.error("Add piece button not found!");
 	}
-
-	// --- (Optional) Initial piece creation ---
-	// You can uncomment and modify this section to create initial pieces on page load
-	// const initialPiece = createPuzzlePieceElement(1, {
-	//     top: EdgeType.FLAT,
-	//     right: EdgeType.TAB_OUT,
-	//     bottom: EdgeType.FLAT,
-	//     left: EdgeType.TAB_IN,
-	//     labelText: "Piece 1",
-	//     initialX: 50,
-	//     initialY: 50,
-	//     color: 'lightblue'
-	// });
-	// puzzleContainer.appendChild(initialPiece);
 });
