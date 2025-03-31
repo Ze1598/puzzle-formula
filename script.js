@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const modal = document.getElementById('piece-edit-modal');
 	const closeModal = document.querySelector('.close-modal');
 	const pieceLabelInput = document.getElementById('piece-label');
+	const pieceColorInput = document.getElementById('piece-color');
 	const topEdgeSelect = document.getElementById('top-edge');
 	const rightEdgeSelect = document.getElementById('right-edge');
 	const bottomEdgeSelect = document.getElementById('bottom-edge');
@@ -76,15 +77,40 @@ document.addEventListener('DOMContentLoaded', () => {
 		currentPiece = piece;
 		const pieceId = getPieceId(piece);
 		const label = piece.querySelector('.piece-label');
+		const path = piece.querySelector('.puzzle-piece-path');
 		
 		console.log('Opening modal for piece:', pieceId);
 		console.log('Current store contents:', Array.from(pieceConfigStore.entries()));
 		
 		// Get current values
 		const currentLabel = label.textContent;
+		const currentColor = path.style.fill;
+		
+		// Convert color to hex if it's a named color
+		let hexColor = currentColor;
+		if (!currentColor.startsWith('#')) {
+			// Create a temporary div to convert named color to hex
+			const tempDiv = document.createElement('div');
+			tempDiv.style.color = currentColor;
+			document.body.appendChild(tempDiv);
+			hexColor = window.getComputedStyle(tempDiv).color;
+			document.body.removeChild(tempDiv);
+			
+			// Convert rgb(r,g,b) to hex
+			if (hexColor.startsWith('rgb')) {
+				const rgb = hexColor.match(/\d+/g).map(Number);
+				hexColor = '#' + rgb.map(x => {
+					const hex = x.toString(16);
+					return hex.length === 1 ? '0' + hex : hex;
+				}).join('');
+			}
+		}
+		
+		console.log('Current color:', currentColor, 'Converted to hex:', hexColor);
 		
 		// Set modal values
 		pieceLabelInput.value = currentLabel;
+		pieceColorInput.value = hexColor;
 		
 		// Get edge types from the store
 		const pieceConfig = pieceConfigStore.get(pieceId);
@@ -138,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const label = currentPiece.querySelector('.piece-label');
 			label.textContent = pieceLabelInput.value;
 			
-			// Create new piece with updated edge types
+			// Create new piece with updated edge types and color
 			const newConfig = {
 				top: topEdgeSelect.value,
 				right: rightEdgeSelect.value,
@@ -147,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				labelText: pieceLabelInput.value,
 				initialX: parseInt(currentPiece.style.left),
 				initialY: parseInt(currentPiece.style.top),
-				color: currentPiece.querySelector('.puzzle-piece-path').style.fill
+				color: pieceColorInput.value
 			};
 			
 			// Update the store
