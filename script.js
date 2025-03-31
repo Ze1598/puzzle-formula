@@ -147,10 +147,21 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
+	// Add Enter key listener for saving changes
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Enter' && modal.style.display === 'block') {
+			e.preventDefault(); // Prevent form submission
+			if (currentPiece) {
+				saveChangesButton.click();
+				hideModal();
+			}
+		}
+	});
+
 	deletePieceButton.addEventListener('click', () => {
 		if (currentPiece) {
 			const pieceId = getPieceId(currentPiece);
-			console.log('Deleting piece via modal:', pieceId);
+			console.log('Deleting piece configuration:', pieceId);
 			
 			// Remove from store and save to localStorage
 			pieceConfigStore.delete(pieceId);
@@ -440,17 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		deleteButton.innerHTML = '×';
 		deleteButton.addEventListener('click', (e) => {
 			e.stopPropagation(); // Prevent dragging when clicking delete
-			const pieceId = getPieceId(wrapper);
-			console.log('Deleting piece via delete button:', pieceId);
-			
-			// Remove from store and save to localStorage
-			pieceConfigStore.delete(pieceId);
-			saveToLocalStorage();
-			
-			// Remove the piece from the DOM
 			wrapper.remove();
-			
-			console.log('Piece deleted and store updated:', pieceId);
 		});
 		wrapper.appendChild(deleteButton);
 
