@@ -150,11 +150,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	deletePieceButton.addEventListener('click', () => {
 		if (currentPiece) {
 			const pieceId = getPieceId(currentPiece);
-			console.log('Deleting piece configuration:', pieceId);
+			console.log('Deleting piece via modal:', pieceId);
+			
+			// Remove from store and save to localStorage
 			pieceConfigStore.delete(pieceId);
-			currentPiece.remove();
 			saveToLocalStorage();
+			
+			// Remove the piece from the DOM
+			currentPiece.remove();
+			
+			// Hide the modal
 			hideModal();
+			
+			console.log('Piece deleted and store updated:', pieceId);
 		}
 	});
 
@@ -210,6 +218,55 @@ document.addEventListener('DOMContentLoaded', () => {
 		TAB_OUT: 'tab_out', // Protrudes outwards
 		TAB_IN: 'tab_in'   // Indents inwards
 	};
+
+	// --- Color Contrast Functions ---
+	function getLuminance(r, g, b) {
+		const [rs, gs, bs] = [r, g, b].map(c => {
+			c = c / 255;
+			return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+		});
+		return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+	}
+
+	function getContrastRatio(color1, color2) {
+		const l1 = getLuminance(...color1);
+		const l2 = getLuminance(...color2);
+		const lighter = Math.max(l1, l2);
+		const darker = Math.min(l1, l2);
+		return (lighter + 0.05) / (darker + 0.05);
+	}
+
+	function shouldUseWhiteText(backgroundColor) {
+		// Convert hex to RGB
+		const hex = backgroundColor.replace('#', '');
+		const r = parseInt(hex.substr(0, 2), 16);
+		const g = parseInt(hex.substr(2, 2), 16);
+		const b = parseInt(hex.substr(4, 2), 16);
+		
+		// Calculate contrast with black text
+		const contrastWithBlack = getContrastRatio([r, g, b], [0, 0, 0]);
+		// Calculate contrast with white text
+		const contrastWithWhite = getContrastRatio([r, g, b], [255, 255, 255]);
+		
+		// Use white text if it provides better contrast
+		return contrastWithWhite > contrastWithBlack;
+	}
+
+	// --- Random Color Generation ---
+	function generateRandomColor() {
+		// Generate random RGB values
+		const r = Math.floor(Math.random() * 256);
+		const g = Math.floor(Math.random() * 256);
+		const b = Math.floor(Math.random() * 256);
+		
+		// Convert to hex
+		const toHex = (n) => {
+			const hex = n.toString(16);
+			return hex.length === 1 ? '0' + hex : hex;
+		};
+		
+		return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+	}
 
 	// --- NEW Helper: Generate SVG Path segment between two points ---
 	// Uses absolute L and C commands. Returns a string like " L x,y C c1x,c1y c2x,c2y x2,y2 L xEnd, yEnd"
@@ -346,12 +403,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		const label = document.createElement('div');
 		label.className = 'piece-label';
 		label.textContent = labelText || '';
+		
+		// Set text color based on background color contrast
+		const backgroundColor = color || 'lightblue';
+		label.style.color = shouldUseWhiteText(backgroundColor) ? '#ffffff' : '#333333';
+		
 		// Center the label within the logical PIECE_WIDTH x PIECE_HEIGHT area
-		label.style.width = `${PIECE_WIDTH}px`; // Give width for centering text
-		label.style.position = 'absolute'; // Position relative to wrapper
-		label.style.top = `${PIECE_HEIGHT / 2}px`; // Center vertically in the base H area
-		label.style.left = `${PIECE_WIDTH / 2}px`;  // Center horizontally in the base W area
-		label.style.transform = 'translate(-50%, -50%)'; // Fine-tune centering
+		label.style.width = `${PIECE_WIDTH}px`;
+		label.style.position = 'absolute';
+		label.style.top = `${PIECE_HEIGHT / 2}px`;
+		label.style.left = `${PIECE_WIDTH / 2}px`;
+		label.style.transform = 'translate(-50%, -50%)';
 
 		// Handle double-click on the wrapper to show edit modal
 		wrapper.addEventListener('dblclick', (e) => {
@@ -378,7 +440,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		deleteButton.innerHTML = '×';
 		deleteButton.addEventListener('click', (e) => {
 			e.stopPropagation(); // Prevent dragging when clicking delete
+			const pieceId = getPieceId(wrapper);
+			console.log('Deleting piece via delete button:', pieceId);
+			
+			// Remove from store and save to localStorage
+			pieceConfigStore.delete(pieceId);
+			saveToLocalStorage();
+			
+			// Remove the piece from the DOM
 			wrapper.remove();
+			
+			console.log('Piece deleted and store updated:', pieceId);
 		});
 		wrapper.appendChild(deleteButton);
 
@@ -531,7 +603,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				labelText: labelText,
 				initialX: 50,
 				initialY: 50,
-				color: 'lightblue'
+				color: generateRandomColor() // Use random color instead of lightblue
 			};
 			const newPiece = createPuzzlePieceElement(newId, config);
 			puzzleContainer.appendChild(newPiece);
