@@ -212,3 +212,48 @@ body {
 #delete-piece:hover {
     background-color: #da190b;
 }
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.button-group button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.button-group button:hover {
+    background-color: #45a049;
+}
+
+#add-piece-button {
+    background-color: #4CAF50;
+}
+
+#add-piece-button:hover {
+    background-color: #45a049;
+}
+
+#export-data-button {
+    background-color: #2196F3;
+}
+
+#export-data-button:hover {
+    background-color: #1976D2;
+}
+
+#import-data-button {
+    background-color: #FF9800;
+}
+
+#import-data-button:hover {
+    background-color: #F57C00;
+}

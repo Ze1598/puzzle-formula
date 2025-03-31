@@ -604,4 +604,72 @@ document.addEventListener('DOMContentLoaded', () => {
 	} else {
 		console.error("Add piece button not found!");
 	}
+
+	// --- Export/Import Functionality ---
+	const exportDataButton = document.getElementById('export-data-button');
+	const importDataButton = document.getElementById('import-data-button');
+
+	if (exportDataButton) {
+		exportDataButton.addEventListener('click', () => {
+			const data = localStorage.getItem('puzzlePieces');
+			if (!data) {
+				alert('No puzzle data to export!');
+				return;
+			}
+
+			// Create a blob with the data
+			const blob = new Blob([data], { type: 'application/json' });
+			// Create a URL for the blob
+			const url = URL.createObjectURL(blob);
+			// Create a temporary link element
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'puzzle-data.json';
+			// Append to body, click, and remove
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			// Clean up the URL
+			URL.revokeObjectURL(url);
+		});
+	} else {
+		console.error("Export data button not found!");
+	}
+
+	if (importDataButton) {
+		importDataButton.addEventListener('click', () => {
+			// Create a file input element
+			const input = document.createElement('input');
+			input.type = 'file';
+			input.accept = '.json';
+			
+			input.onchange = (e) => {
+				const file = e.target.files[0];
+				if (!file) return;
+
+				const reader = new FileReader();
+				reader.onload = (event) => {
+					try {
+						const data = JSON.parse(event.target.result);
+						// Validate the data structure
+						if (!Array.isArray(data)) {
+							throw new Error('Invalid data format');
+						}
+						// Store the data in localStorage
+						localStorage.setItem('puzzlePieces', JSON.stringify(data));
+						// Reload the puzzle
+						loadFromLocalStorage();
+					} catch (error) {
+						console.error('Error importing data:', error);
+						alert('Error importing puzzle data. Please make sure the file is valid.');
+					}
+				};
+				reader.readAsText(file);
+			};
+			
+			input.click();
+		});
+	} else {
+		console.error("Import data button not found!");
+	}
 });
