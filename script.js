@@ -18,6 +18,47 @@ document.addEventListener('DOMContentLoaded', () => {
 		return `piece-${id}`;
 	}
 
+	// --- Local Storage Functions ---
+	function saveToLocalStorage() {
+		const storeData = Array.from(pieceConfigStore.entries()).map(([id, config]) => ({
+			id,
+			...config
+		}));
+		localStorage.setItem('puzzlePieces', JSON.stringify(storeData));
+		console.log('Saved to localStorage:', storeData);
+	}
+
+	function loadFromLocalStorage() {
+		const savedData = localStorage.getItem('puzzlePieces');
+		if (savedData) {
+			const storeData = JSON.parse(savedData);
+			console.log('Loading from localStorage:', storeData);
+			
+			// Clear existing pieces
+			puzzleContainer.innerHTML = '';
+			
+			// Recreate pieces from saved data
+			storeData.forEach(pieceData => {
+				const { id, top, right, bottom, left, position, labelText, color } = pieceData;
+				const config = {
+					top,
+					right,
+					bottom,
+					left,
+					labelText: labelText || `Piece ${id}`,
+					initialX: position[0],
+					initialY: position[1],
+					color: color || 'lightblue'
+				};
+				const piece = createPuzzlePieceElement(id, config);
+				puzzleContainer.appendChild(piece);
+			});
+			
+			return true;
+		}
+		return false;
+	}
+
 	// --- Modal Functionality ---
 	const modal = document.getElementById('piece-edit-modal');
 	const closeModal = document.querySelector('.close-modal');
@@ -86,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			console.log('Deleting piece configuration:', pieceId);
 			pieceConfigStore.delete(pieceId);
 			currentPiece.remove();
+			saveToLocalStorage();
 			hideModal();
 		}
 	});
@@ -114,13 +156,17 @@ document.addEventListener('DOMContentLoaded', () => {
 				top: newConfig.top,
 				right: newConfig.right,
 				bottom: newConfig.bottom,
-				left: newConfig.left
+				left: newConfig.left,
+				position: [newConfig.initialX, newConfig.initialY],
+				labelText: newConfig.labelText,
+				color: newConfig.color
 			});
 			
 			// Replace the old piece with a new one
 			const newPiece = createPuzzlePieceElement(pieceId, newConfig);
 			currentPiece.replaceWith(newPiece);
 			
+			saveToLocalStorage();
 			hideModal();
 		}
 	});
@@ -205,7 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			top,
 			right,
 			bottom,
-			left
+			left,
+			position: [initialX, initialY],
+			labelText,
+			color
 		});
 
 		// Create the wrapper div
@@ -373,8 +422,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			document.removeEventListener('touchend', endDrag);
 			document.removeEventListener('touchcancel', endDrag);
 
-			// Placeholder for connection logic
-			// checkForConnection(element);
+			// Update position in store and save to localStorage
+			const pieceId = getPieceId(element);
+			const config = pieceConfigStore.get(pieceId);
+			if (config) {
+				config.position = [parseInt(element.style.left), parseInt(element.style.top)];
+				saveToLocalStorage();
+			}
 		}
 	}
 
@@ -418,15 +472,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	];
 
-	initialPieces.forEach((config, index) => {
-		const pieceId = (index + 1).toString();
-		const piece = createPuzzlePieceElement(pieceId, {
-			...config,
-			labelText: `Piece ${pieceId}`
+	// Try to load saved state, if none exists create initial pieces
+	if (!loadFromLocalStorage()) {
+		initialPieces.forEach((config, index) => {
+			const pieceId = (index + 1).toString();
+			const piece = createPuzzlePieceElement(pieceId, {
+				...config,
+				labelText: `Piece ${pieceId}`
+			});
+			puzzleContainer.appendChild(piece);
+			console.log('Created initial piece:', pieceId, config);
 		});
-		puzzleContainer.appendChild(piece);
-		console.log('Created initial piece:', pieceId, config);
-	});
+		saveToLocalStorage();
+	}
 
 	// --- NEW: Add piece button functionality ---
 	const addPieceButton = document.getElementById('add-piece-button');
@@ -452,6 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const newPiece = createPuzzlePieceElement(newId, config);
 			puzzleContainer.appendChild(newPiece);
 			console.log('Added new piece:', newId, config);
+			saveToLocalStorage();
 		});
 	} else {
 		console.error("Add piece button not found!");
