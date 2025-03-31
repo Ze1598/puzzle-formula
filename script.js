@@ -148,7 +148,35 @@ document.addEventListener('DOMContentLoaded', () => {
 		label.style.top = `${PIECE_HEIGHT / 2}px`; // Center vertically in the base H area
 		label.style.left = `${PIECE_WIDTH / 2}px`;  // Center horizontally in the base W area
 		label.style.transform = 'translate(-50%, -50%)'; // Fine-tune centering
+
+		// Handle double-click on the wrapper to make label editable
+		wrapper.addEventListener('dblclick', (e) => {
+			e.stopPropagation(); // Prevent any other double-click handlers
+			label.contentEditable = true;
+			label.focus();
+		});
+
+		// Handle label editing completion
+		label.addEventListener('blur', () => {
+			label.contentEditable = false;
+		});
+
+		// Prevent dragging when editing
+		label.addEventListener('mousedown', (e) => {
+			e.stopPropagation();
+		});
+
 		wrapper.appendChild(label); // Add label to wrapper
+
+		// Add delete button
+		const deleteButton = document.createElement('div');
+		deleteButton.className = 'delete-button';
+		deleteButton.innerHTML = '×';
+		deleteButton.addEventListener('click', (e) => {
+			e.stopPropagation(); // Prevent dragging when clicking delete
+			wrapper.remove();
+		});
+		wrapper.appendChild(deleteButton);
 
 		// Add dragging behaviour to the wrapper
 		addDragFunctionality(wrapper);
