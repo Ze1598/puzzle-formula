@@ -1,0 +1,77 @@
+body {
+	font-family: sans-serif;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0;
+	padding: 20px;
+	background-color: #f0f0f0;
+}
+
+#puzzle-container {
+	position: relative;
+	/* Crucial for positioning pieces */
+	width: 80vw;
+	height: 70vh;
+	border: 2px solid #ccc;
+	background-color: #ffffff;
+	overflow: hidden;
+	/* Optional: hide pieces dragged outside */
+	margin-top: 20px;
+}
+
+.puzzle-piece-wrapper {
+	position: absolute;
+	/* Allows positioning within the container */
+	cursor: grab;
+	/* Prevent text selection while dragging */
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	/* Contain the SVG and label */
+	display: inline-block;
+	/* Adjusts size to content */
+}
+
+.puzzle-piece-wrapper.dragging {
+	cursor: grabbing;
+	z-index: 1000;
+	/* Bring dragged piece to the front */
+	opacity: 0.8;
+	/* Visual feedback for dragging */
+}
+
+.puzzle-piece-svg {
+	display: block;
+	/* Prevent extra space below SVG */
+	overflow: visible;
+	/* Allow tabs/indents to draw outside the base rect */
+}
+
+.puzzle-piece-path {
+	fill: lightblue;
+	stroke: #333;
+	stroke-width: 1.5;
+	stroke-linejoin: round;
+	/* Nicer corners */
+}
+
+.piece-label {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 14px;
+	font-weight: bold;
+	color: #333;
+	text-align: center;
+	pointer-events: none;
+	/* Allow clicks/drags to pass through to the piece */
+	white-space: nowrap;
+	/* Keep label on one line for simplicity */
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 80%;
+	/* Prevent text overflowing too much */
+}
