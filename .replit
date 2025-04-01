@@ -1,16 +1,10 @@
-modules = ["nodejs-20", "web"]
+entrypoint = "index.html"
+hidden = [".config"]
+modules = ["web:v2-20230623-0b7a606"]
 
 [nix]
-channel = "stable-24_05"
+channel = "stable-23_11"
 
-[workflows]
-runButton = "Run"
-
-[[workflows.workflow]]
-name = "Run"
-author = 162399
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python -m http.server 5000 --bind 0.0.0.0"
+[deployment]
+publicDir = "/"
+deploymentTarget = "static"
